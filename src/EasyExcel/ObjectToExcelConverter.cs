@@ -7,7 +7,7 @@ using System;
 
 namespace EasyExcel
 {
-    public sealed class ObjectToExcelConverter
+    public sealed class ObjectToExcelConverter 
     {
         public static void CreateFileFromObjectCollection<T>(IEnumerable<ExcelByColumnLetter> columnsMapping, IEnumerable<T> data, string targetSpreadsheetPath)
         {
