@@ -1,3 +1,4 @@
+using EasyExcel.Exceptions;
 using EasyExcel.MappingModels.Object;
 using EasyExcel.Tests.TestModels;
 using OfficeOpenXml;
@@ -69,6 +70,7 @@ namespace EasyExcel.Tests
 
             // Assert
             var spreadsheet = new ExcelPackage(spreadsheetStream).Workbook.Worksheets.FirstOrDefault();
+            spreadsheetStream.Dispose();
 
             var line = 2;
             foreach (var employee in employees)
@@ -81,6 +83,45 @@ namespace EasyExcel.Tests
 
                 line += 1;
             }
+            
+        }
+
+        [Fact]
+        public void ExcelSpreadSheetFile_GetObjectCollection_SpreadsheetValueConversionException()
+        {
+            // Arrange
+            var spreadsheetFilePath = Path.Combine(Directory.GetParent(Path.GetDirectoryName(Environment.CurrentDirectory)).Parent.ToString(), "TestFiles\\EmployeesConversionException.xlsx");
+
+            var columnsMapping = new List<ObjectByColumnIndex> {
+                new ObjectByColumnIndex(1, "Name", true),
+                new ObjectByColumnIndex(2, "Gender", true),
+                new ObjectByColumnIndex(3, "DateOfBirth", true),
+                new ObjectByColumnIndex(4, "Height", true),
+                new ObjectByColumnIndex(5, "Weight", true)
+            };
+
+            // Assert
+            var ex = Assert.Throws<SpreadsheetValueConversionException>(() => ExcelToObjectConverter.ToObjectCollection<Employee>(spreadsheetFilePath, columnsMapping));
+            Assert.Equal("It was not possible to convert value: 'Very Tall' to attribute Height(System.Decimal) at line 101 and column '4' of spreadsheet.", ex.Message);
+        }
+
+        [Fact]
+        public void ExcelSpreadSheetFile_GetObjectCollection_SpreadsheetEmptyRequiredFieldException()
+        {
+            // Arrange
+            var spreadsheetFilePath = Path.Combine(Directory.GetParent(Path.GetDirectoryName(Environment.CurrentDirectory)).Parent.ToString(), "TestFiles\\EmployeesRequiredFieldException.xlsx");
+
+            var columnsMapping = new List<ObjectByColumnIndex> {
+                new ObjectByColumnIndex(1, "Name", true),
+                new ObjectByColumnIndex(2, "Gender", true),
+                new ObjectByColumnIndex(3, "DateOfBirth", true),
+                new ObjectByColumnIndex(4, "Height", true),
+                new ObjectByColumnIndex(5, "Weight", true)
+            };
+
+            // Assert
+            var ex = Assert.Throws<SpreadsheetEmptyRequiredFieldException>(() => ExcelToObjectConverter.ToObjectCollection<Employee>(spreadsheetFilePath, columnsMapping));
+            Assert.Equal("The required field Gender is empty at line 43 of spreadsheet.", ex.Message);
         }
     }
 }

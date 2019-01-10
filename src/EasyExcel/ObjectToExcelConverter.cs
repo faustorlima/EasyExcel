@@ -9,12 +9,26 @@ namespace EasyExcel
 {
     public sealed class ObjectToExcelConverter 
     {
+        /// <summary>
+        /// Create an excel file from a list of objects according to column letter mapping
+        /// </summary>
+        /// <typeparam name="T">Type of object list (Class)</typeparam>
+        /// <param name="columnsMapping">Collection of ExcelByColumnLetter that maps object attributes to columns</param>
+        /// <param name="data">object collection</param>
+        /// <param name="targetSpreadsheetPath">file path for the spreadsheet be generated</param>
         public static void CreateFileFromObjectCollection<T>(IEnumerable<ExcelByColumnLetter> columnsMapping, IEnumerable<T> data, string targetSpreadsheetPath)
         {
             var columnIndexMapping = ConverterHelper.GetMappingWriteByColumnIndex(columnsMapping);
             CreateFileFromObjectCollection<T>(columnIndexMapping, data, targetSpreadsheetPath);
         }
-        
+
+        /// <summary>
+        /// Create an excel file from a list of objects according to column index mapping
+        /// </summary>
+        /// <typeparam name="T">Type of object list (Class)</typeparam>
+        /// <param name="columnsMapping">Collection of ExcelByColumnIndex that maps object attributes to columns</param>
+        /// <param name="data">object collection</param>
+        /// <param name="targetSpreadsheetPath">file path for the spreadsheet be generated</param>
         public static void CreateFileFromObjectCollection<T>(IEnumerable<ExcelByColumnIndex> columnsMapping, IEnumerable<T> data, string targetSpreadsheetPath)
         {
             var stream = FromObjectCollection<T>(columnsMapping, data);
@@ -23,13 +37,27 @@ namespace EasyExcel
                 stream.CopyTo(output);
             }
         }
-        
+
+        /// <summary>
+        /// Returns an excel file stream from a list of objects according to column letter mapping
+        /// </summary>
+        /// <typeparam name="T">Type of object list (Class)</typeparam>
+        /// <param name="columnsMapping">Collection of ExcelByColumnLetter that maps object attributes to columns</param>
+        /// <param name="data">object collection</param>
+        /// <returns>Excel file stream</returns>
         public static Stream FromObjectCollection<T>(IEnumerable<ExcelByColumnLetter> columnsMapping, IEnumerable<T> data)
         {
             var columnIndexMapping = ConverterHelper.GetMappingWriteByColumnIndex(columnsMapping);
             return FromObjectCollection<T>(columnIndexMapping, data);
         }
-        
+
+        /// <summary>
+        /// Returns an excel file stream from a list of objects according to column index mapping
+        /// </summary>
+        /// <typeparam name="T">Type of object list (Class)</typeparam>
+        /// <param name="columnsMapping">Collection of ExcelByColumnIndex that maps object attributes to columns</param>
+        /// <param name="data">object collection</param>
+        /// <returns>Excel file stream</returns>
         public static Stream FromObjectCollection<T>(IEnumerable<ExcelByColumnIndex> columnsMapping, IEnumerable<T> data)
         {
             var s = new MemoryStream();

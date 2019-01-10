@@ -5,29 +5,58 @@ using System.Collections.Generic;
 using EasyExcel.Helper;
 using OfficeOpenXml;
 using EasyExcel.MappingModels.Object;
+using EasyExcel.Exceptions;
 
 namespace EasyExcel
 {
     public class ExcelToObjectConverter
     {
+        /// <summary>
+        /// Converts an Excel file to a list of objects according to column letter mapping
+        /// </summary>
+        /// <typeparam name="T">Object type (Class)</typeparam>
+        /// <param name="spreadsheetFilePath">Excel file path</param>
+        /// <param name="columnsMapping">Collection of ObjectByColumnLetter that maps the excel columns to object</param>
+        /// <returns>Collection of objects</returns>
         public static IEnumerable<T> ToObjectCollection<T>(string spreadsheetFilePath, IEnumerable<ObjectByColumnLetter> columnsMapping) where T : new()
         {
             var columnIndexMapping = ConverterHelper.GetMappingReadByColumnIndex(columnsMapping);
             return ToObjectCollection<T>(spreadsheetFilePath, columnIndexMapping);
         }
 
+        /// <summary>
+        /// Converts an Excel file to a list of objects according to column index mapping
+        /// </summary>
+        /// <typeparam name="T">Object type (Class)</typeparam>
+        /// <param name="spreadsheetFilePath">Excel file path</param>
+        /// <param name="columnsMapping">Collection of ObjectByColumnIndex that maps the excel columns to object</param>
+        /// <returns>Collection of objects</returns>
         public static IEnumerable<T> ToObjectCollection<T>(string spreadsheetFilePath, IEnumerable<ObjectByColumnIndex> columnsMapping) where T : new()
         {
             using (var stream = File.OpenRead(spreadsheetFilePath))
                 return ToObjectCollection<T>(stream, columnsMapping);
         }
 
+        /// <summary>
+        /// Converts an Excel file stream to a list of objects according to column letter mapping
+        /// </summary>
+        /// <typeparam name="T">Object type (Class)</typeparam>
+        /// <param name="spreadsheet">Excel file strean</param>
+        /// <param name="columnsMapping">Collection of ObjectByColumnLetter that maps the excel columns to object</param>
+        /// <returns>Collection of objects</returns>
         public static IEnumerable<T> ToObjectCollection<T>(Stream spreadsheet, IEnumerable<ObjectByColumnLetter> columnsMapping) where T : new()
         {
             var columnIndexMapping = ConverterHelper.GetMappingReadByColumnIndex(columnsMapping);
             return ToObjectCollection<T>(spreadsheet, columnIndexMapping);
         }
 
+        /// <summary>
+        /// Converts an Excel file stream to a list of objects according to column index mapping
+        /// </summary>
+        /// <typeparam name="T">Object type (Class)</typeparam>
+        /// <param name="spreadsheet">Excel file strean</param>
+        /// <param name="columnsMapping">Collection of ObjectByColumnIndex that maps the excel columns to object</param>
+        /// <returns></returns>
         public static IEnumerable<T> ToObjectCollection<T>(Stream spreadsheet, IEnumerable<ObjectByColumnIndex> columnsMapping) where T : new()
         {
             var r = new List<T>();
@@ -62,14 +91,15 @@ namespace EasyExcel
                         if (value == null)
                         {
                             if (columnMapping.Required)
-                                throw new Exception(string.Format("The required field {0} is empty at line {1} of spreadsheet.", property.Name, spreadsheetLine));
+                                throw new SpreadsheetEmptyRequiredFieldException(string.Format("The required field {0} is empty at line {1} of spreadsheet.", property.Name, spreadsheetLine));
                             else
                                 continue;
                         }
 
+                        Type type = null;
+
                         try
-                        {
-                            Type type = null;
+                        {   
                             if (Nullable.GetUnderlyingType(property.PropertyType) != null)
                             {
                                 if (property.PropertyType.IsEnum)
@@ -86,7 +116,7 @@ namespace EasyExcel
                         }
                         catch
                         {
-                            throw new Exception(string.Format("It was not possible to convert value: '{0}' to attribute {1}({2}) at line {3} and column '{4}' of spreadsheet.", value, property.Name, property.PropertyType, spreadsheetLine, columnMapping.ColumnIndex));
+                            throw new SpreadsheetValueConversionException(string.Format("It was not possible to convert value: '{0}' to attribute {1}({2}) at line {3} and column '{4}' of spreadsheet.", value, property.Name, type, spreadsheetLine, columnMapping.ColumnIndex));
                         }
                     }
                 }
