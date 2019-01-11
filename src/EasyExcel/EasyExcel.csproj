@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Fausto Lima</Authors>
+	<Company>Fausto Lima</Company>
+	<PackageId>EasyExcel</PackageId>
+	<Version>1.0.0</Version>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>excel, conversion, convert excel to object, convert object to excel, easy way to read excel, easy way to write excel, excel reader, excel writter</PackageTags>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+	<Description>EasyExcel is a simple but very powerful tool that provides an easy way to convert object list to excel and excel to an object list.</Description>
   </PropertyGroup>
 
   <ItemGroup>
