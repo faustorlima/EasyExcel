@@ -118,3 +118,4 @@ var spreadsheetStream = File.OpenRead(spreadsheetFilePath);
 var employees = ExcelToObjectConverter.ToObjectCollection<Employee>(spreadsheetStream, columnsMapping);
 ```` 
 
+You can install this package on [Nuget](https://www.nuget.org/packages/EasyExcel)
